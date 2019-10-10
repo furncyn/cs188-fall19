@@ -23,13 +23,7 @@ def reportAccuracy(true_labels, predicted_labels, label_dict):
     # label_dict is a 15x1 cell array where each entry is a string
     # containing the name of that category
     # accuracy is a scalar, defined in the spec (in %)
-
-    # def createDictOfCounts(labels: Tuple[int]) -> Dict[int, int]:
-    #     labels_arr = np.array(labels)
-    #     unique, counts = np.unique(labels_arr, return_counts=True)
-    #     return dict(zip(unique, counts))
    
-
     # Do we allow labels with different lengths??
     # if lengths are different, output error
     # if len(true_labels) != len(predicted_labels):
