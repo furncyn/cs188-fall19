@@ -23,17 +23,12 @@ def reportAccuracy(true_labels, predicted_labels, label_dict):
     # label_dict is a 15x1 cell array where each entry is a string
     # containing the name of that category
     # accuracy is a scalar, defined in the spec (in %)
-   
-    # Do we allow labels with different lengths??
-    # if lengths are different, output error
-    # if len(true_labels) != len(predicted_labels):
-    #     print("Error: input arrays have different lengths")
-    #     return 0
-
+    
+    # Assume that labels with different lenghts are allowed
+    
     num_correct_predictions = 0
     num_predictions = len(true_labels)
-
-    # try, except statement allows for cases where lengths of two labels are different
+    
     for i in range(len(predicted_labels)):
         try:
             if true_labels[i] == predicted_labels[i]:
