@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import timeit
+from Typing import Tuple, Dict
 from sklearn import neighbors, svm, cluster
 
 def imresize(input_image, target_size):
@@ -23,6 +24,30 @@ def reportAccuracy(true_labels, predicted_labels, label_dict):
     # containing the name of that category
     # accuracy is a scalar, defined in the spec (in %)
 
+    # def createDictOfCounts(labels: Tuple[int]) -> Dict[int, int]:
+    #     labels_arr = np.array(labels)
+    #     unique, counts = np.unique(labels_arr, return_counts=True)
+    #     return dict(zip(unique, counts))
+   
+
+    # Do we allow labels with different lengths??
+    # if lengths are different, output error
+    # if len(true_labels) != len(predicted_labels):
+    #     print("Error: input arrays have different lengths")
+    #     return 0
+
+    num_correct_predictions = 0
+    num_predictions = len(true_labels)
+
+    # try, except statement allows for cases where lengths of two labels are different
+    for i in range(len(predicted_labels)):
+        try:
+            if true_labels[i] == predicted_labels[i]:
+                num_correct_predictions += 1  
+        except:
+            continue
+    
+    accuracy = num_correct_predictions/num_predictions * 100
     return accuracy
 
 def buildDict(train_images, dict_size, feature_type, clustering_type):
@@ -37,7 +62,7 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
 
     # the output 'vocabulary' should be dict_size x d, where d is the 
     # dimention of the feature. each row is a cluster centroid / visual word.
-        return vocabulary
+    return vocabulary
 
 def computeBow(image, vocabulary, feature_type):
     # extracts features from the image, and returns a BOW representation using a vocabulary
@@ -56,6 +81,5 @@ def tinyImages(train_features, test_features, train_labels, test_labels, label_d
     # test_labels is a nx1 array of integers, containing the label values
     # label_dict is a 15x1 array of strings, containing the names of the labels
     # classResult is a 18x1 array, containing accuracies and runtimes
-    
     return classResult
     
