@@ -6,6 +6,10 @@ from sklearn import neighbors, svm, cluster
 def imresize(input_image, target_size):
     # resizes the input image to a new image of size [target_size, target_size]. 
     # normalizes the output image to be zero-mean, and in the [-1, 1] range.
+    input_img = cv2.imread(input_image)
+    resized_img = cv2.resize(input_img, tuple(target_size))
+    output_image = cv2.normalize(resized_img, None, alpha=-1, beta=1)
+
     return output_image
 
 def reportAccuracy(true_labels, predicted_labels, label_dict):
