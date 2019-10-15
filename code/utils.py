@@ -1,11 +1,16 @@
 import cv2
 import numpy as np
 import timeit
+from Typing import Tuple, Dict
 from sklearn import neighbors, svm, cluster
 
 def imresize(input_image, target_size):
     # resizes the input image to a new image of size [target_size, target_size]. 
     # normalizes the output image to be zero-mean, and in the [-1, 1] range.
+    input_img = cv2.imread(input_image)
+    resized_img = cv2.resize(input_img, tuple(target_size))
+    output_image = cv2.normalize(resized_img, None, alpha=-1, beta=1)
+
     return output_image
 
 def reportAccuracy(true_labels, predicted_labels, label_dict):
@@ -18,7 +23,20 @@ def reportAccuracy(true_labels, predicted_labels, label_dict):
     # label_dict is a 15x1 cell array where each entry is a string
     # containing the name of that category
     # accuracy is a scalar, defined in the spec (in %)
-
+    
+    # Assume that labels with different lenghts are allowed
+    
+    num_correct_predictions = 0
+    num_predictions = len(true_labels)
+    
+    for i in range(len(predicted_labels)):
+        try:
+            if true_labels[i] == predicted_labels[i]:
+                num_correct_predictions += 1  
+        except:
+            continue
+    
+    accuracy = num_correct_predictions/num_predictions * 100
     return accuracy
 
 def buildDict(train_images, dict_size, feature_type, clustering_type):
@@ -33,7 +51,7 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
 
     # the output 'vocabulary' should be dict_size x d, where d is the 
     # dimention of the feature. each row is a cluster centroid / visual word.
-        return vocabulary
+    return vocabulary
 
 def computeBow(image, vocabulary, feature_type):
     # extracts features from the image, and returns a BOW representation using a vocabulary
@@ -52,6 +70,5 @@ def tinyImages(train_features, test_features, train_labels, test_labels, label_d
     # test_labels is a nx1 array of integers, containing the label values
     # label_dict is a 15x1 array of strings, containing the names of the labels
     # classResult is a 18x1 array, containing accuracies and runtimes
-    
     return classResult
     
