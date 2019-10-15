@@ -13,6 +13,9 @@ def KNN_classifier(train_features, train_labels, test_features, num_neighbors):
     # starter code.
     # predicted_categories is an M x 1 array, where each entry is an integer
     # indicating the predicted category for each test image.
+    neigh = neighbors.KNeighborsClassifier(n_neighbors=num_neighbors)
+    neigh.neighbors.fit(train_features, test_features)
+    predicted_categories = neigh.neighbors.predict(train_labels)
     return predicted_categories
 
 
