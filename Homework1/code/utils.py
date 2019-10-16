@@ -167,13 +167,17 @@ def tinyImages(train_features, test_features, train_labels, test_labels):
     for i in range(len(img_sizes)):
         for j in range(len(num_neighbors)):
             img_size = [img_sizes[i], img_sizes[i]]
+            start_time = time.time()
             predicted_labels = KNN_classifier(
                 train_features=resize_list_of_images(train_features, img_size),
                 train_labels=train_labels,
                 test_features=resize_list_of_images(test_features, img_size),
                 num_neighbors=num_neighbors[j],
             )
+            runtime = time.time() - start_time
             accuracy = reportAccuracy(test_labels, predicted_labels)
+            
             classResult.append(accuracy)
+            classResult.append(runtime)
     return classResult
     

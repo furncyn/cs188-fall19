@@ -35,16 +35,16 @@ if __name__ == "__main__":
         tinyRes = tinyImages(train_images, test_images, train_labels, test_labels)
     
         print(tinyRes)
-        # # Split accuracies and runtimes for saving  
-        # for element in tinyRes[::2]:
-        #     # Check that every second element is an accuracy in reasonable bounds
-        #     assert (7 < element and element < 20)
-        # acc = np.asarray(tinyRes[::2])
-        # runtime = np.asarray(tinyRes[1::2])
+        # Split accuracies and runtimes for saving  
+        for element in tinyRes[::2]:
+            # Check that every second element is an accuracy in reasonable bounds
+            assert (7 < element and element < 20)
+        acc = np.asarray(tinyRes[::2])
+        runtime = np.asarray(tinyRes[1::2])
     
-        # # Save results
-        # np.save(SAVEPATH + 'tiny_acc.npy', acc)
-        # np.save(SAVEPATH + 'tiny_time.npy', runtime)
+        # Save results
+        np.save(SAVEPATH + 'tiny_acc.npy', acc)
+        np.save(SAVEPATH + 'tiny_time.npy', runtime)
 
     # Create vocabularies, and save them in the result directory
     # You need to write the buildDict function
