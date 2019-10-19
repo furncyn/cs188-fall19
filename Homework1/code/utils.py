@@ -80,7 +80,14 @@ def imresize(input_image, target_size):
     # resizes the input image, represented as a 2D array, to a new image of size [target_size, target_size]. 
     # Normalizes the output image to be zero-mean, and in the [-1, 1] range.
     resized_img = cv2.resize(input_image, tuple(target_size))
-    output_image = cv2.normalize(resized_img, None, alpha=-1, beta=1)
+    output_image = cv2.normalize(
+            src=resized_img, 
+            dst=None, 
+            alpha=-1, 
+            beta=1, 
+            norm_type=cv2.NORM_MINMAX, # specified to improve accuracy by ~2
+            dtype=cv2.CV_32F, # specified such that output is float instead of int
+    )
     return output_image
 
 
@@ -159,6 +166,9 @@ def tinyImages(train_features, test_features, train_labels, test_labels):
     classResult = []
 
     def resize_list_of_images(image_features, img_size):
+    # A helper function that takes in a list of images and a target image size
+    # and calls imresize function for all images in the list. 
+    # It returns a list of resized images.
         resized_features = []
         for img in image_features:
             resized_features.append(imresize(img, img_size).flatten())
@@ -174,10 +184,12 @@ def tinyImages(train_features, test_features, train_labels, test_labels):
                 test_features=resize_list_of_images(test_features, img_size),
                 num_neighbors=num_neighbors[j],
             )
+
             runtime = time.time() - start_time
             accuracy = reportAccuracy(test_labels, predicted_labels)
             
-            classResult.append(accuracy)
-            classResult.append(runtime)
+            classResult.append(round(accuracy, 2))
+            classResult.append(round(runtime, 2))
+
     return classResult
     
