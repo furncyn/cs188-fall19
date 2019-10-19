@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import timeit, time
 from sklearn import neighbors, svm, cluster, preprocessing
+from sklearn.cluster import AgglomerativeClustering, KMeans
 
 
 def load_data():
@@ -122,6 +123,46 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
 
     # NOTE: Should you run out of memory or have performance issues, feel free to limit the 
     # number of descriptors you store per image.
+
+    #Write a function buildDict that samples the speciﬁed features from the training images 
+    # (SIFT, SURF or ORB), and outputs a vocabulary of the speciﬁed size, by clustering them 
+    # using either K-means or hierarchical agglomerative clustering. Cluster centroids will 
+    # be the words in your vocabulary. Use an Euclidean metric to compute distances. 
+    # (Hint: OpenCV has implementations for SIFT/SURF/ORB feature detection. 
+    # Sklean has implementations for Kmeans and Hierarchical Agglomerative Clustering)
+    #sample descriptors from ALL training images
+    all_descriptors = []
+    for image in train_images:
+        img = cv.imread(image)
+        kp = []
+        des = []
+        if (feature_type == "sift"):    
+            gray= cv.cvtColor(img,cv.COLOR_BGR2GRAY)
+            sift = cv.xfeatures2d.SIFT_create()
+            kp,des = sift.detectAndCompute(gray,None)
+            all_descriptors.append(des)
+        else if (feature_type == "surf"):
+            surf = cv.xfeatures2d.SURF_create()
+            kp,des = surf.detectAndCompute(img,None)
+            all_descriptors.append(des)
+        else if (feature_type == "orb"):
+            orb = cv.xfeatures2d.ORB_create()
+            kp,des = orb.detectAndCompute(img,None)
+            all_descriptors.append(des)
+    # Built a list of descriptors, convert to numpy array
+    np = np.asarray(all_descriptors)
+    vocabulary = []
+    if (clustering_type == "kmeans"):
+        kmeans = KMeans(n_clusters=dict_size).fit_predict(np)
+        vocabulary = kmeans
+    else if (clustering_type == "hierarchical"):
+        # default metric is euclidean
+       clustering = AgglomerativeClustering(n_clusters=dict_size).fit_predict(np)
+       for label in clustering:
+           # average the descriptors for each label
+           label = label/len(all_descriptors)
+       vocabulary = clustering
+    # return a list
     return vocabulary
 
 
