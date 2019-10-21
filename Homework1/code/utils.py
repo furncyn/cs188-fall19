@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import cv2
 import numpy as np
@@ -131,37 +132,26 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
     # (Hint: OpenCV has implementations for SIFT/SURF/ORB feature detection. 
     # Sklean has implementations for Kmeans and Hierarchical Agglomerative Clustering)
     #sample descriptors from ALL training images
+    vocabulary = np.zeros(dict_size)
     all_descriptors = []
-    for image in train_images:
-        img = cv.imread(image)
-        kp = []
-        des = []
-        if (feature_type == "sift"):    
-            gray= cv.cvtColor(img,cv.COLOR_BGR2GRAY)
-            sift = cv.xfeatures2d.SIFT_create()
-            kp,des = sift.detectAndCompute(gray,None)
-            all_descriptors.append(des)
-        else if (feature_type == "surf"):
-            surf = cv.xfeatures2d.SURF_create()
-            kp,des = surf.detectAndCompute(img,None)
-            all_descriptors.append(des)
-        else if (feature_type == "orb"):
-            orb = cv.xfeatures2d.ORB_create()
-            kp,des = orb.detectAndCompute(img,None)
-            all_descriptors.append(des)
+    if (feature_type == "sift"):    
+        feature = cv2.xfeatures2d.SIFT_create()
+    elif (feature_type == "surf"):
+        feature = cv2.xfeatures2d.SURF_create()
+    elif (feature_type == "orb"):
+        feature = cv2.ORB_create()
+    for img in train_images:    
+        _,des = feature.detectAndCompute(img,None)
+        for descriptor in des:
+            all_descriptors.append(descriptor)
+    print("descriptors calculated")
     # Built a list of descriptors, convert to numpy array
-    np = np.asarray(all_descriptors)
-    vocabulary = []
     if (clustering_type == "kmeans"):
-        kmeans = KMeans(n_clusters=dict_size).fit_predict(np)
-        vocabulary = kmeans
-    else if (clustering_type == "hierarchical"):
-        # default metric is euclidean
-       clustering = AgglomerativeClustering(n_clusters=dict_size).fit_predict(np)
-       for label in clustering:
-           # average the descriptors for each label
-           label = label/len(all_descriptors)
-       vocabulary = clustering
+        clustering = KMeans(n_clusters=dict_size, n_jobs=-1).fit_predict(all_descriptors)
+    elif (clustering_type == "hierarchical"):
+        clustering = AgglomerativeClustering(n_clusters=dict_size).fit_predict(all_descriptors)
+    for c in clustering:
+        vocabulary[c] += 1
     # return a list
     return vocabulary
 
