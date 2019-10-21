@@ -142,14 +142,16 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
         feature = cv2.ORB_create()
     for img in train_images:    
         _,des = feature.detectAndCompute(img,None)
-        for descriptor in des:
-            all_descriptors.append(descriptor)
+        if (des is not None):
+            for descriptor in des:
+                all_descriptors.append(descriptor)
     print("descriptors calculated")
     # Built a list of descriptors, convert to numpy array
     if (clustering_type == "kmeans"):
         clustering = KMeans(n_clusters=dict_size, n_jobs=-1).fit_predict(all_descriptors)
     elif (clustering_type == "hierarchical"):
-        clustering = AgglomerativeClustering(n_clusters=dict_size).fit_predict(all_descriptors)
+        # nparray = np.asarray(all_descriptors)
+        clustering = AgglomerativeClustering(n_clusters=dict_size).fit(all_descriptors)
     for c in clustering:
         vocabulary[c] += 1
     # return a list

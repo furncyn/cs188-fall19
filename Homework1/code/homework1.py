@@ -54,8 +54,8 @@ if __name__ == "__main__":
     # e.g vocab_idx[i] will tell you which algorithms/neighbors were used to compute vocabulary i
     # This isn't used in the rest of the code so you can feel free to ignore it
 
-    for feature in ['surf']:
-        for algo in ['kmeans']:
+    for feature in ['sift']:
+        for algo in ['hierarchical']:
             for dict_size in [20]:
                 vocabulary = buildDict(train_images, dict_size, feature, algo)
                 print(vocabulary)
