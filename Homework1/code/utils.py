@@ -135,13 +135,15 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
     vocabulary = np.zeros(dict_size)
     all_descriptors = []
     if (feature_type == "sift"):    
-        feature = cv2.xfeatures2d.SIFT_create()
+        feature = cv2.xfeatures2d.SIFT_create(nfeatures=25)
     elif (feature_type == "surf"):
         feature = cv2.xfeatures2d.SURF_create()
     elif (feature_type == "orb"):
-        feature = cv2.ORB_create()
+        feature = cv2.ORB_create(nfeatures=25)
     for img in train_images:    
         _,des = feature.detectAndCompute(img,None)
+        if (feature_type == "surf"):
+            des = random.sample(des,25)
         if (des is not None):
             for descriptor in des:
                 all_descriptors.append(descriptor)
@@ -151,7 +153,7 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
         clustering = KMeans(n_clusters=dict_size, n_jobs=-1).fit_predict(all_descriptors)
     elif (clustering_type == "hierarchical"):
         # nparray = np.asarray(all_descriptors)
-        clustering = AgglomerativeClustering(n_clusters=dict_size).fit(all_descriptors)
+        clustering = AgglomerativeClustering(n_clusters=dict_size).fit_predict(all_descriptors)
     for c in clustering:
         vocabulary[c] += 1
     # return a list
