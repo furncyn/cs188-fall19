@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from utils import *
 import argparse
 
@@ -30,21 +31,21 @@ if __name__ == "__main__":
     # Load data, the function is written for you in utils
     train_images, test_images, train_labels, test_labels = load_data()
     
-    if args.tiny:
-        # You have to write the tinyImages function
-        tinyRes = tinyImages(train_images, test_images, train_labels, test_labels)
+    # if args.tiny:
+    #     # You have to write the tinyImages function
+    #     tinyRes = tinyImages(train_images, test_images, train_labels, test_labels)
     
-        print(tinyRes)
-        # Split accuracies and runtimes for saving  
-        for element in tinyRes[::2]:
-            # Check that every second element is an accuracy in reasonable bounds
-            assert (7 < element and element < 20)
-        acc = np.asarray(tinyRes[::2])
-        runtime = np.asarray(tinyRes[1::2])
+    #     print(tinyRes)
+    #     # Split accuracies and runtimes for saving  
+    #     for element in tinyRes[::2]:
+    #         # Check that every second element is an accuracy in reasonable bounds
+    #         assert (7 < element and element < 20)
+    #     acc = np.asarray(tinyRes[::2])
+    #     runtime = np.asarray(tinyRes[1::2])
     
-        # Save results
-        np.save(SAVEPATH + 'tiny_acc.npy', acc)
-        np.save(SAVEPATH + 'tiny_time.npy', runtime)
+    #     # Save results
+    #     np.save(SAVEPATH + 'tiny_acc.npy', acc)
+    #     np.save(SAVEPATH + 'tiny_time.npy', runtime)
 
     # Create vocabularies, and save them in the result directory
     # You need to write the buildDict function
@@ -53,15 +54,15 @@ if __name__ == "__main__":
     # e.g vocab_idx[i] will tell you which algorithms/neighbors were used to compute vocabulary i
     # This isn't used in the rest of the code so you can feel free to ignore it
 
-    for feature in ['sift', 'surf', 'orb']:
-        for algo in ['kmeans', 'hierarchical']:
-            for dict_size in [20, 50]:
+    for feature in ['sift']:
+        for algo in ['hierarchical']:
+            for dict_size in [20]:
                 vocabulary = buildDict(train_images, dict_size, feature, algo)
-                filename = 'voc_' + feature + '_' + algo + '_' + str(dict_size) + '.npy'
-                np.save(SAVEPATH + filename, np.asarray(vocabulary))
-                vocabularies.append(vocabulary) # A list of vocabularies (which are 2D arrays)
-                vocab_idx.append(filename.split('.')[0]) # Save the map from index to vocabulary
-                
+                print(vocabulary)
+                # filename = 'voc_' + feature + '_' + algo + '_' + str(dict_size) + '.npy'
+                # np.save(SAVEPATH + filename, np.asarray(vocabulary))
+                # vocabularies.append(vocabulary) # A list of vocabularies (which are 2D arrays)
+                # vocab_idx.append(filename.split('.')[0]) # Save the map from index to vocabulary
     # Compute the Bow representation for the training and testing sets
     test_rep = [] # To store a set of BOW representations for the test images (given a vocabulary)
     train_rep = [] # To store a set of BOW representations for the train images (given a vocabulary)

@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 import os
 import cv2
 import numpy as np
 import timeit, time
 from sklearn import neighbors, svm, cluster, preprocessing
+from sklearn.cluster import AgglomerativeClustering, KMeans
 
 
 def load_data():
@@ -129,6 +131,39 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
 
     # NOTE: Should you run out of memory or have performance issues, feel free to limit the 
     # number of descriptors you store per image.
+
+    #Write a function buildDict that samples the speciﬁed features from the training images 
+    # (SIFT, SURF or ORB), and outputs a vocabulary of the speciﬁed size, by clustering them 
+    # using either K-means or hierarchical agglomerative clustering. Cluster centroids will 
+    # be the words in your vocabulary. Use an Euclidean metric to compute distances. 
+    # (Hint: OpenCV has implementations for SIFT/SURF/ORB feature detection. 
+    # Sklean has implementations for Kmeans and Hierarchical Agglomerative Clustering)
+    #sample descriptors from ALL training images
+    vocabulary = np.zeros(dict_size)
+    all_descriptors = []
+    if (feature_type == "sift"):    
+        feature = cv2.xfeatures2d.SIFT_create(nfeatures=25)
+    elif (feature_type == "surf"):
+        feature = cv2.xfeatures2d.SURF_create()
+    elif (feature_type == "orb"):
+        feature = cv2.ORB_create(nfeatures=25)
+    for img in train_images:    
+        _,des = feature.detectAndCompute(img,None)
+        if (feature_type == "surf"):
+            des = random.sample(des,25)
+        if (des is not None):
+            for descriptor in des:
+                all_descriptors.append(descriptor)
+    print("descriptors calculated")
+    # Built a list of descriptors, convert to numpy array
+    if (clustering_type == "kmeans"):
+        clustering = KMeans(n_clusters=dict_size, n_jobs=-1).fit_predict(all_descriptors)
+    elif (clustering_type == "hierarchical"):
+        # nparray = np.asarray(all_descriptors)
+        clustering = AgglomerativeClustering(n_clusters=dict_size).fit_predict(all_descriptors)
+    for c in clustering:
+        vocabulary[c] += 1
+    # return a list
     return vocabulary
 
 
