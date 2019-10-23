@@ -188,16 +188,6 @@ def computeBow(image, vocabulary, feature_type):
     # used to create the vocabulary
 
     # BOW is the new image representation, a normalized histogram
-    # if (feature_type == "sift"):    
-    #     feature = cv2.xfeatures2d.SIFT_create(nfeatures=25)
-    # elif (feature_type == "surf"):
-    #     feature = cv2.xfeatures2d.SURF_create()
-    # elif (feature_type == "orb"):
-    #     feature = cv2.ORB_create(nfeatures=25)
-    
-    # _, descriptors = feature.detectAndCompute(image, None)
-
-    # Bow = np.histogram(vocabulary)
     return None
 
 

@@ -32,8 +32,7 @@ def print_nparr(feature, cluster, dict_size):
     print(f"{feature}, {cluster}, {dict_size}")
     path = f"Results/voc_{feature}_{cluster}_{dict_size}.npy"
     nparr = np.load(path)
-    print(nparr.size)
-    # print(nparr)
+    print(nparr)
 
 
 if args.all:
