@@ -1,8 +1,11 @@
+# -*- coding: utf-8 -*-
 import os
 import cv2
 import numpy as np
 import timeit, time
+import random
 from sklearn import neighbors, svm, cluster, preprocessing
+from sklearn.cluster import AgglomerativeClustering, KMeans
 
 
 def load_data():
@@ -129,6 +132,50 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
 
     # NOTE: Should you run out of memory or have performance issues, feel free to limit the 
     # number of descriptors you store per image.
+
+    # Limit the number of features to prevent memory error
+    feature_size = 20
+    all_descriptors = []
+
+    # Extract features of the images using specified feature type
+    if (feature_type == "sift"):    
+        feature = cv2.xfeatures2d.SIFT_create(nfeatures=feature_size)
+    elif (feature_type == "surf"):
+        feature = cv2.xfeatures2d.SURF_create()
+    elif (feature_type == "orb"):
+        feature = cv2.ORB_create(nfeatures=feature_size)
+    for img in train_images:    
+        _, des = feature.detectAndCompute(img,None)
+        if (feature_type == "surf"):
+            des = random.sample(list(des), feature_size)
+        if (des is not None):
+            for descriptor in des:
+                all_descriptors.append(descriptor)
+    print("Descriptors calculated")
+
+    vocabulary = [None for x in range(dict_size)]
+
+    # Build clusters from all the descriptors obtained and create a vocabulary from clustering
+    if (clustering_type == "kmeans"):
+        clustering = KMeans(n_clusters=dict_size, n_jobs=-1).fit(all_descriptors)
+        vocabulary = clustering.cluster_centers_
+    elif (clustering_type == "hierarchical"):
+        # Default affinity for AgglomerativeClustering is euclidian.
+        clustering = AgglomerativeClustering(n_clusters=dict_size).fit(all_descriptors)
+        
+        # Add all descriptors with the same label and store it in vocabulary
+        labels = clustering.labels_
+        for i in range(len(labels)):
+            if vocabulary[labels[i]] is None:
+                vocabulary[labels[i]] = all_descriptors[i]
+            else:
+                vocabulary[labels[i]] = np.add(vocabulary[labels[i]], all_descriptors[i])
+
+        # Calculate the cluster centroids by dividing the number of descriptors per labels to its sum
+        for i in range(dict_size):
+            count = len(vocabulary[i])
+            vocabulary[i] = np.true_divide(vocabulary[i], count)
+    print(vocabulary)
     return vocabulary
 
 
@@ -141,7 +188,7 @@ def computeBow(image, vocabulary, feature_type):
     # used to create the vocabulary
 
     # BOW is the new image representation, a normalized histogram
-    return Bow
+    return None
 
 
 def tinyImages(train_features, test_features, train_labels, test_labels):
