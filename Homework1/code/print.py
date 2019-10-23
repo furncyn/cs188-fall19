@@ -1,3 +1,8 @@
+"""
+Simple python script that takes in feature_type, clustering_type and dict_size as positional arguments
+and print out the corresponding file in Results/
+The script takes an all flag (--all) to print every voc file in Results/
+"""
 import argparse
 import numpy as np
 
@@ -32,8 +37,7 @@ def print_nparr(feature, cluster, dict_size):
     print(f"{feature}, {cluster}, {dict_size}")
     path = f"Results/voc_{feature}_{cluster}_{dict_size}.npy"
     nparr = np.load(path)
-    print(nparr.size)
-    # print(nparr)
+    print(nparr)
 
 
 if args.all:

@@ -187,18 +187,25 @@ def computeBow(image, vocabulary, feature_type):
     # feature type is a string (from "sift", "surf", "orb") specifying the feature
     # used to create the vocabulary
 
-    # BOW is the new image representation, a normalized histogram
-    # if (feature_type == "sift"):    
-    #     feature = cv2.xfeatures2d.SIFT_create(nfeatures=25)
-    # elif (feature_type == "surf"):
-    #     feature = cv2.xfeatures2d.SURF_create()
-    # elif (feature_type == "orb"):
-    #     feature = cv2.ORB_create(nfeatures=25)
+    # BOW is the new image representation, a normalized histogram 
+    feature_size = 20
+    if (feature_type == "sift"):    
+        feature = cv2.xfeatures2d.SIFT_create(nfeatures=feature_size)
+    elif (feature_type == "surf"):
+        feature = cv2.xfeatures2d.SURF_create()
+    elif (feature_type == "orb"):
+        feature = cv2.ORB_create(nfeatures=feature_size)
     
-    # _, descriptors = feature.detectAndCompute(image, None)
+    _, descriptors = feature.detectAndCompute(image, None)
 
-    # Bow = np.histogram(vocabulary)
-    return None
+    Bow = [0] * len(vocabulary)
+
+    for des in descriptors:
+        dist_2 = np.sum((vocabulary - des)**2, axis=1)
+        bucket = np.argmin(dist_2)
+        Bow[bucket] += 1
+
+    return Bow
 
 
 def tinyImages(train_features, test_features, train_labels, test_labels):
