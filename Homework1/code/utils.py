@@ -3,6 +3,7 @@ import os
 import cv2
 import numpy as np
 import timeit, time
+import random
 from sklearn import neighbors, svm, cluster, preprocessing
 from sklearn.cluster import AgglomerativeClustering, KMeans
 
@@ -132,38 +133,51 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
     # NOTE: Should you run out of memory or have performance issues, feel free to limit the 
     # number of descriptors you store per image.
 
-    #Write a function buildDict that samples the speciﬁed features from the training images 
-    # (SIFT, SURF or ORB), and outputs a vocabulary of the speciﬁed size, by clustering them 
-    # using either K-means or hierarchical agglomerative clustering. Cluster centroids will 
-    # be the words in your vocabulary. Use an Euclidean metric to compute distances. 
-    # (Hint: OpenCV has implementations for SIFT/SURF/ORB feature detection. 
-    # Sklean has implementations for Kmeans and Hierarchical Agglomerative Clustering)
-    #sample descriptors from ALL training images
-    vocabulary = np.zeros(dict_size)
+    # Limit the number of features to prevent memory error
+    feature_size = 20
     all_descriptors = []
+
     if (feature_type == "sift"):    
-        feature = cv2.xfeatures2d.SIFT_create(nfeatures=25)
+        feature = cv2.xfeatures2d.SIFT_create(nfeatures=feature_size)
     elif (feature_type == "surf"):
         feature = cv2.xfeatures2d.SURF_create()
     elif (feature_type == "orb"):
-        feature = cv2.ORB_create(nfeatures=25)
+        feature = cv2.ORB_create(nfeatures=feature_size)
     for img in train_images:    
-        _,des = feature.detectAndCompute(img,None)
+        _, des = feature.detectAndCompute(img,None)
         if (feature_type == "surf"):
-            des = random.sample(des,25)
+            des = random.sample(list(des), feature_size)
         if (des is not None):
             for descriptor in des:
                 all_descriptors.append(descriptor)
-    print("descriptors calculated")
-    # Built a list of descriptors, convert to numpy array
+    print("Descriptors calculated")
+
+    vocabulary = [None for x in range(dict_size)]
+
+    # Build clusters from all the descriptors obtained and create a vocabulary from clustering
     if (clustering_type == "kmeans"):
-        clustering = KMeans(n_clusters=dict_size, n_jobs=-1).fit_predict(all_descriptors)
+        clustering = KMeans(n_clusters=dict_size, n_jobs=-1).fit(all_descriptors)
+        vocabulary = clustering.cluster_centers_
     elif (clustering_type == "hierarchical"):
-        # nparray = np.asarray(all_descriptors)
-        clustering = AgglomerativeClustering(n_clusters=dict_size).fit_predict(all_descriptors)
-    for c in clustering:
-        vocabulary[c] += 1
-    # return a list
+        # Default affinity for AgglomerativeClustering is euclidian.
+        clustering = AgglomerativeClustering(n_clusters=dict_size).fit(all_descriptors)
+        # Extract cluster centroids manually
+        labels = clustering.labels_
+        for i in range(feature_size):
+            total = 0
+            descriptors_with_same_label = []
+            # Collect all descriptors with same label
+            for j in range(len(all_descriptors)):
+                if i == labels[j]:
+                    descriptors_with_same_label.append(all_descriptors[j])
+            # Calculate cluster centroid as an array of 128 elements for each label
+            dim = descriptors_with_same_label[0].size
+            total = np.zeros(dim)
+            for des in descriptors_with_same_label:
+                total = np.add(total, des)
+            cluster_centroid = np.true_divide(total, len(descriptors_with_same_label))
+            vocabulary.append(cluster_centroid)
+    
     return vocabulary
 
 
@@ -176,6 +190,16 @@ def computeBow(image, vocabulary, feature_type):
     # used to create the vocabulary
 
     # BOW is the new image representation, a normalized histogram
+    if (feature_type == "sift"):    
+        feature = cv2.xfeatures2d.SIFT_create(nfeatures=25)
+    elif (feature_type == "surf"):
+        feature = cv2.xfeatures2d.SURF_create()
+    elif (feature_type == "orb"):
+        feature = cv2.ORB_create(nfeatures=25)
+    
+    _, descriptors = feature.detectAndCompute(image, None)
+
+    Bow = np.histogram(vocabulary)
     return Bow
 
 

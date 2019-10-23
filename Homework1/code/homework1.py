@@ -34,12 +34,10 @@ if __name__ == "__main__":
     # if args.tiny:
     #     # You have to write the tinyImages function
     #     tinyRes = tinyImages(train_images, test_images, train_labels, test_labels)
-    
-    #     print(tinyRes)
     #     # Split accuracies and runtimes for saving  
     #     for element in tinyRes[::2]:
     #         # Check that every second element is an accuracy in reasonable bounds
-    #         assert (7 < element and element < 20)
+    #         assert (7 < element and element < 21)
     #     acc = np.asarray(tinyRes[::2])
     #     runtime = np.asarray(tinyRes[1::2])
     
@@ -54,21 +52,22 @@ if __name__ == "__main__":
     # e.g vocab_idx[i] will tell you which algorithms/neighbors were used to compute vocabulary i
     # This isn't used in the rest of the code so you can feel free to ignore it
 
-    for feature in ['sift']:
+    for feature in ['orb']:
         for algo in ['hierarchical']:
             for dict_size in [20]:
                 vocabulary = buildDict(train_images, dict_size, feature, algo)
                 print(vocabulary)
-                # filename = 'voc_' + feature + '_' + algo + '_' + str(dict_size) + '.npy'
-                # np.save(SAVEPATH + filename, np.asarray(vocabulary))
-                # vocabularies.append(vocabulary) # A list of vocabularies (which are 2D arrays)
+                filename = 'voc_' + feature + '_' + algo + '_' + str(dict_size) + '.npy'
+                np.save(SAVEPATH + filename, np.asarray(vocabulary))
+                vocabularies.append(vocabulary) # A list of vocabularies (which are 2D arrays)
                 # vocab_idx.append(filename.split('.')[0]) # Save the map from index to vocabulary
+
     # Compute the Bow representation for the training and testing sets
     test_rep = [] # To store a set of BOW representations for the test images (given a vocabulary)
     train_rep = [] # To store a set of BOW representations for the train images (given a vocabulary)
     features = ['sift'] * 4 + ['surf'] * 4 + ['orb'] * 4 # Order in which features were used 
     # for vocabulary generation
-    
+
     # You need to write ComputeBow()
     for i, vocab in enumerate(vocabularies):
         for image in train_images: # Compute the BOW representation of the training set
