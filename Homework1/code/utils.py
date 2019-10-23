@@ -137,6 +137,7 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
     feature_size = 20
     all_descriptors = []
 
+    # Extract features of the images using specified feature type
     if (feature_type == "sift"):    
         feature = cv2.xfeatures2d.SIFT_create(nfeatures=feature_size)
     elif (feature_type == "surf"):
@@ -161,23 +162,20 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
     elif (clustering_type == "hierarchical"):
         # Default affinity for AgglomerativeClustering is euclidian.
         clustering = AgglomerativeClustering(n_clusters=dict_size).fit(all_descriptors)
-        # Extract cluster centroids manually
+        
+        # Add all descriptors with the same label and store it in vocabulary
         labels = clustering.labels_
-        for i in range(feature_size):
-            total = 0
-            descriptors_with_same_label = []
-            # Collect all descriptors with same label
-            for j in range(len(all_descriptors)):
-                if i == labels[j]:
-                    descriptors_with_same_label.append(all_descriptors[j])
-            # Calculate cluster centroid as an array of 128 elements for each label
-            dim = descriptors_with_same_label[0].size
-            total = np.zeros(dim)
-            for des in descriptors_with_same_label:
-                total = np.add(total, des)
-            cluster_centroid = np.true_divide(total, len(descriptors_with_same_label))
-            vocabulary.append(cluster_centroid)
-    
+        for i in range(len(labels)):
+            if vocabulary[labels[i]] is None:
+                vocabulary[labels[i]] = all_descriptors[i]
+            else:
+                vocabulary[labels[i]] = np.add(vocabulary[labels[i]], all_descriptors[i])
+
+        # Calculate the cluster centroids by dividing the number of descriptors per labels to its sum
+        for i in range(dict_size):
+            count = len(vocabulary[i])
+            vocabulary[i] = np.true_divide(vocabulary[i], count)
+    print(vocabulary)
     return vocabulary
 
 
@@ -190,17 +188,17 @@ def computeBow(image, vocabulary, feature_type):
     # used to create the vocabulary
 
     # BOW is the new image representation, a normalized histogram
-    if (feature_type == "sift"):    
-        feature = cv2.xfeatures2d.SIFT_create(nfeatures=25)
-    elif (feature_type == "surf"):
-        feature = cv2.xfeatures2d.SURF_create()
-    elif (feature_type == "orb"):
-        feature = cv2.ORB_create(nfeatures=25)
+    # if (feature_type == "sift"):    
+    #     feature = cv2.xfeatures2d.SIFT_create(nfeatures=25)
+    # elif (feature_type == "surf"):
+    #     feature = cv2.xfeatures2d.SURF_create()
+    # elif (feature_type == "orb"):
+    #     feature = cv2.ORB_create(nfeatures=25)
     
-    _, descriptors = feature.detectAndCompute(image, None)
+    # _, descriptors = feature.detectAndCompute(image, None)
 
-    Bow = np.histogram(vocabulary)
-    return Bow
+    # Bow = np.histogram(vocabulary)
+    return None
 
 
 def tinyImages(train_features, test_features, train_labels, test_labels):

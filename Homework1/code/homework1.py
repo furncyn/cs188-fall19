@@ -3,8 +3,9 @@ from utils import *
 import argparse
 
 parser = argparse.ArgumentParser(description='CS188.2 - Fall 19 - Homework 1')
-parser.add_argument("--tiny", "-t", type=bool, default=True, help='run Tiny Images')
+parser.add_argument("--tiny", "-t", type=bool, default=False, help='run Tiny Images')
 parser.add_argument("--create-path", "-cp", type=bool, default=True, help='create the Results directory')
+parser.add_argument("--create-vocabs", "-cv", type=bool, default=False, help='create a new set of vocabularies, instead of loading from Results directory')
 args = parser.parse_args()
 
 # The argument is included as an idea for debugging, with a few examples in the main. Feel free to modify it or add arguments.
@@ -31,19 +32,20 @@ if __name__ == "__main__":
     # Load data, the function is written for you in utils
     train_images, test_images, train_labels, test_labels = load_data()
     
-    # if args.tiny:
-    #     # You have to write the tinyImages function
-    #     tinyRes = tinyImages(train_images, test_images, train_labels, test_labels)
-    #     # Split accuracies and runtimes for saving  
-    #     for element in tinyRes[::2]:
-    #         # Check that every second element is an accuracy in reasonable bounds
-    #         assert (7 < element and element < 21)
-    #     acc = np.asarray(tinyRes[::2])
-    #     runtime = np.asarray(tinyRes[1::2])
+    # Change the default for --tiny to be False. Need to specify True if want to run this function.
+    if args.tiny:
+        # You have to write the tinyImages function
+        tinyRes = tinyImages(train_images, test_images, train_labels, test_labels)
+        # Split accuracies and runtimes for saving  
+        for element in tinyRes[::2]:
+            # Check that every second element is an accuracy in reasonable bounds
+            assert (7 < element and element < 21)
+        acc = np.asarray(tinyRes[::2])
+        runtime = np.asarray(tinyRes[1::2])
     
-    #     # Save results
-    #     np.save(SAVEPATH + 'tiny_acc.npy', acc)
-    #     np.save(SAVEPATH + 'tiny_time.npy', runtime)
+        # Save results
+        np.save(SAVEPATH + 'tiny_acc.npy', acc)
+        np.save(SAVEPATH + 'tiny_time.npy', runtime)
 
     # Create vocabularies, and save them in the result directory
     # You need to write the buildDict function
@@ -52,15 +54,20 @@ if __name__ == "__main__":
     # e.g vocab_idx[i] will tell you which algorithms/neighbors were used to compute vocabulary i
     # This isn't used in the rest of the code so you can feel free to ignore it
 
-    for feature in ['orb']:
-        for algo in ['hierarchical']:
-            for dict_size in [20]:
-                vocabulary = buildDict(train_images, dict_size, feature, algo)
-                print(vocabulary)
-                filename = 'voc_' + feature + '_' + algo + '_' + str(dict_size) + '.npy'
-                np.save(SAVEPATH + filename, np.asarray(vocabulary))
+    # If create_vocabs flag is not specified, read vocabularies from specified directory of Results/ by default.
+    # Otherwise, generate a new set of vocabularies from train images.
+    for feature in ['sift', 'surf', 'orb']:
+        for algo in ['kmeans', 'hierarchical']:
+            for dict_size in [20, 50]:
+                if args.create_vocabs:
+                    vocabulary = buildDict(train_images, dict_size, feature, algo)
+                    filename = 'voc_' + feature + '_' + algo + '_' + str(dict_size) + '.npy'
+                    np.save(SAVEPATH + filename, np.asarray(vocabulary))
+                else:
+                    filename = f"{SAVEPATH}/voc_{feature}_{algo}_{dict_size}.npy"
+                    vocabulary = np.load(filename)
                 vocabularies.append(vocabulary) # A list of vocabularies (which are 2D arrays)
-                # vocab_idx.append(filename.split('.')[0]) # Save the map from index to vocabulary
+                vocab_idx.append(filename.split('.')[0]) # Save the map from index to vocabulary
 
     # Compute the Bow representation for the training and testing sets
     test_rep = [] # To store a set of BOW representations for the test images (given a vocabulary)
