@@ -188,22 +188,34 @@ def computeBow(image, vocabulary, feature_type):
     # used to create the vocabulary
 
     # BOW is the new image representation, a normalized histogram 
-    feature_size = 20
-    if (feature_type == "sift"):    
+
+    feature_size = 10
+    if feature_type == "sift":    
         feature = cv2.xfeatures2d.SIFT_create(nfeatures=feature_size)
-    elif (feature_type == "surf"):
+    elif feature_type == "surf":
         feature = cv2.xfeatures2d.SURF_create()
-    elif (feature_type == "orb"):
+    elif feature_type == "orb":
         feature = cv2.ORB_create(nfeatures=feature_size)
     
     _, descriptors = feature.detectAndCompute(image, None)
+   
+    # Limit the number of features to 20 for surf
+    if feature_type == "surf":
+        try:
+            descriptors = random.sample(list(descriptors), feature_size)
+        except:
+            # Descriptor size < 20, do nothing and continue
+            pass
 
     Bow = [0] * len(vocabulary)
-
-    for des in descriptors:
-        dist_2 = np.sum((vocabulary - des)**2, axis=1)
-        bucket = np.argmin(dist_2)
-        Bow[bucket] += 1
+    try:
+        for des in descriptors:
+            dist_2 = np.sum((vocabulary - des)**2, axis=1)
+            bucket = np.argmin(dist_2)
+            Bow[bucket] += 1
+    except TypeError as e:
+        print(f"{str(e)}. Ignoring this image and returning None.")
+        return None
 
     return Bow
 
