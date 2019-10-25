@@ -82,7 +82,7 @@ if __name__ == "__main__":
     features = ['sift'] * 4 + ['surf'] * 4 + ['orb'] * 4 # Order in which features were used 
     # for vocabulary generation
 
-    print("HELLO")
+    # print("HELLO")
     # start_time = time.time()
     # for i, vocab in enumerate(vocabularies):
     #     print(f"Calling computeBow on vocab {i}")
@@ -104,8 +104,8 @@ if __name__ == "__main__":
     
     # Use BOW features to classify the images with a KNN classifier
     # A list to store the accuracies and one for runtimes
-    knn_accuracies = []
-    knn_runtimes = []
+    # knn_accuracies = []
+    # knn_runtimes = []
 
     print("RIGHT HERE")
     # for i, vocab in enumerate(vocabularies):
