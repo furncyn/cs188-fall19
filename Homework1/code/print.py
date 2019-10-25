@@ -1,3 +1,8 @@
+"""
+Simple python script that takes in feature_type, clustering_type and dict_size as positional arguments
+and print out the corresponding file in Results/
+The script takes an all flag (--all) to print every voc file in Results/
+"""
 import argparse
 import numpy as np
 

@@ -1,2 +1,4 @@
 # Byte-compiled / optimized / DLL files
-__pycache__/
+/code/__pycache__/
+/cs188_2_homework1.pdf
+/data/

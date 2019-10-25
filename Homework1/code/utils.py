@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import timeit, time
 import random
+from scipy import spatial
 from sklearn import neighbors, svm, cluster, preprocessing
 from sklearn.cluster import AgglomerativeClustering, KMeans
 
@@ -134,7 +135,7 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
     # number of descriptors you store per image.
 
     # Limit the number of features to prevent memory error
-    feature_size = 20
+    feature_size = 25
     all_descriptors = []
 
     # Extract features of the images using specified feature type
@@ -146,14 +147,14 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
         feature = cv2.ORB_create(nfeatures=feature_size)
     for img in train_images:    
         _, des = feature.detectAndCompute(img,None)
-        if (feature_type == "surf"):
+        if (feature_type == "surf") and len(des) > feature_size:
             des = random.sample(list(des), feature_size)
         if (des is not None):
             for descriptor in des:
                 all_descriptors.append(descriptor)
-    print("Descriptors calculated")
 
     vocabulary = [None for x in range(dict_size)]
+    count = [0 for x in range(dict_size)] # array of size dict_size that counts the number of elements in each of vocabulary's bins
 
     # Build clusters from all the descriptors obtained and create a vocabulary from clustering
     if (clustering_type == "kmeans"):
@@ -162,7 +163,6 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
     elif (clustering_type == "hierarchical"):
         # Default affinity for AgglomerativeClustering is euclidian.
         clustering = AgglomerativeClustering(n_clusters=dict_size).fit(all_descriptors)
-        
         # Add all descriptors with the same label and store it in vocabulary
         labels = clustering.labels_
         for i in range(len(labels)):
@@ -170,12 +170,11 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
                 vocabulary[labels[i]] = all_descriptors[i]
             else:
                 vocabulary[labels[i]] = np.add(vocabulary[labels[i]], all_descriptors[i])
-
-        # Calculate the cluster centroids by dividing the number of descriptors per labels to its sum
+            count[labels[i]] += 1
+        # Calculate the cluster centroids by dividing the number of descriptors per labels to its sum and normalize the result
         for i in range(dict_size):
-            count = len(vocabulary[i])
-            vocabulary[i] = np.true_divide(vocabulary[i], count)
-    print(vocabulary)
+            vocabulary[i] = np.true_divide(vocabulary[i], count[i])
+
     return vocabulary
 
 
@@ -187,8 +186,30 @@ def computeBow(image, vocabulary, feature_type):
     # feature type is a string (from "sift", "surf", "orb") specifying the feature
     # used to create the vocabulary
 
-    # BOW is the new image representation, a normalized histogram
-    return None
+    # BOW is the new image representation, a normalized histogram 
+
+    if feature_type == "sift":    
+        feature = cv2.xfeatures2d.SIFT_create()
+    elif feature_type == "surf":
+        feature = cv2.xfeatures2d.SURF_create()
+    elif feature_type == "orb":
+        feature = cv2.ORB_create()
+    
+    _, descriptors = feature.detectAndCompute(image, None)
+
+    Bow = [0] * len(vocabulary)
+    try:
+        for des in descriptors:
+            dist_2 = np.sum((vocabulary - des)**2, axis=1)
+            bucket = np.argmin(dist_2)
+            Bow[bucket] += 1
+    except TypeError as e:
+        print(f"WARNING: {str(e)}. Ignoring this image and returning all-zeroes Bow.")
+        return Bow
+
+    # Normalize the Bow representation
+    # Bow = np.asarray(Bow)/float(len(descriptors))
+    return Bow
 
 
 def tinyImages(train_features, test_features, train_labels, test_labels):
