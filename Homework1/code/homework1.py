@@ -125,8 +125,18 @@ if __name__ == "__main__":
     lin_accuracies = []
     lin_runtimes = []
     
-    # Your code below
-    #...
+    for i, vocab in enumerate(vocabularies):
+        train_rep = np.load(f"Result/bow_train{i}.npy")
+        test_rep = np.load(f"Results/bow_test_{i}.npy")
+        start_time = time.time()
+        predicted_categories = SVM_classifier(train_features=train_rep, train_labels=train_labels, test_features=test_rep, True, 10)
+        runtime = time.time() - start_time
+        accuracy = reportAccuracy(test_labels, predicted_labels)
+        lin_accuracies.append(accuracy)
+        lin_runtimes.append(runtime)
+    
+    print("accuracies:", lin_accuracies)
+    print("runtimes:", lin_runtimes)
 
     np.save(SAVEPATH+'lin_accuracies.npy', np.asarray(lin_accuracies)) # Save the accuracies in the Results/ directory
     np.save(SAVEPATH+'lin_runtimes.npy', np.asarray(lin_runtimes)) # Save the runtimes in the Results/ directory
@@ -135,8 +145,18 @@ if __name__ == "__main__":
     rbf_accuracies = []
     rbf_runtimes = []
     
-    # Your code below
-    # ...
+    for i, vocab in enumerate(vocabularies):
+        train_rep = np.load(f"Result/bow_train{i}.npy")
+        test_rep = np.load(f"Results/bow_test_{i}.npy")
+        start_time = time.time()
+        predicted_categories = SVM_classifier(train_features=train_rep, train_labels=train_labels, test_features=test_rep, False, 10)
+        runtime = time.time() - start_time
+        accuracy = reportAccuracy(test_labels, predicted_labels)
+        rbf_accuracies.append(accuracy)
+        rbf_runtimes.append(runtime)
+    
+    print("accuracies:", rbf_accuracies)
+    print("runtimes:", rbf_runtimes)
     
     np.save(SAVEPATH +'rbf_accuracies.npy', np.asarray(rbf_accuracies)) # Save the accuracies in the Results/ directory
     np.save(SAVEPATH +'rbf_runtimes.npy', np.asarray(rbf_runtimes)) # Save the runtimes in the Results/ directory
