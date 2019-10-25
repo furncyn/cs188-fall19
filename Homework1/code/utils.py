@@ -208,7 +208,7 @@ def computeBow(image, vocabulary, feature_type):
         return Bow
 
     # Normalize the Bow representation
-    Bow = np.asarray(Bow)/float(len(descriptors))
+    # Bow = np.asarray(Bow)/float(len(descriptors))
     return Bow
 
 

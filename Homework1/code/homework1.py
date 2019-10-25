@@ -2,6 +2,8 @@
 from utils import *
 import argparse
 
+# TO-DO: change default for tiny and build-dict to True
+
 parser = argparse.ArgumentParser(description='CS188.2 - Fall 19 - Homework 1')
 parser.add_argument("--tiny", "-t", type=bool, default=False, help='run Tiny Images')
 parser.add_argument("--create-path", "-cp", type=bool, default=True, help='create the Results directory')
