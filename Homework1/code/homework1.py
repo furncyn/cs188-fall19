@@ -82,51 +82,64 @@ if __name__ == "__main__":
     features = ['sift'] * 4 + ['surf'] * 4 + ['orb'] * 4 # Order in which features were used 
     # for vocabulary generation
 
-    start_time = time.time()
-    for i, vocab in enumerate(vocabularies):
-        print(f"Calling computeBow on vocab {i}")
-        for image in train_images: # Compute the BOW representation of the training set
-            rep = computeBow(image, vocab, features[i]) # Rep is a list of descriptors for a given image
-            if rep is not None: # only append rep if it is not None
-                train_rep.append(rep)
-        np.save(SAVEPATH + 'bow_train_' + str(i) + '.npy', np.asarray(train_rep)) # Save the representations for vocabulary i
-        train_rep = [] # reset the list to save the following vocabulary
+    print("HELLO")
+    # start_time = time.time()
+    # for i, vocab in enumerate(vocabularies):
+    #     print(f"Calling computeBow on vocab {i}")
+    #     for image in train_images: # Compute the BOW representation of the training set
+    #         rep = computeBow(image, vocab, features[i]) # Rep is a list of descriptors for a given image
+    #         if rep is not None: # only append rep if it is not None
+    #             train_rep.append(rep)
+    #     np.save(SAVEPATH + 'bow_train_' + str(i) + '.npy', np.asarray(train_rep)) # Save the representations for vocabulary i
+    #     train_rep = [] # reset the list to save the following vocabulary
 
-        for image in test_images: # Compute the BOW representation of the testing set
-            rep = computeBow(image, vocab, features[i])
-            if rep is not None: # only append rep if it is not None
-                test_rep.append(rep)
-        np.save(SAVEPATH + 'bow_test_' + str(i) + '.npy', np.asarray(test_rep)) # Save the representations for vocabulary i
-        test_rep = [] # reset the list to save the following vocabulary
-    runtime = time.time() - start_time
-    print("computeBow runtime is", runtime/60)
+    #     for image in test_images: # Compute the BOW representation of the testing set
+    #         rep = computeBow(image, vocab, features[i])
+    #         if rep is not None: # only append rep if it is not None
+    #             test_rep.append(rep)
+    #     np.save(SAVEPATH + 'bow_test_' + str(i) + '.npy', np.asarray(test_rep)) # Save the representations for vocabulary i
+    #     test_rep = [] # reset the list to save the following vocabulary
+    # runtime = time.time() - start_time
+    # print("computeBow runtime is", runtime/60)
     
     # Use BOW features to classify the images with a KNN classifier
     # A list to store the accuracies and one for runtimes
     knn_accuracies = []
     knn_runtimes = []
 
-    for i, vocab in enumerate(vocabularies):
-        train_rep = np.load(f"Results/bow_train_{i}.npy")
-        test_rep = np.load(f"Results/bow_test_{i}.npy")
-        start_time = time.time()
-        predicted_labels = KNN_classifier(train_features=train_rep, train_labels=train_labels, test_features=test_rep, num_neighbors=9)
-        runtime = time.time() - start_time
-        accuracy = reportAccuracy(test_labels, predicted_labels)
-        knn_accuracies.append(accuracy)
-        knn_runtimes.append(runtime)
+    print("RIGHT HERE")
+    # for i, vocab in enumerate(vocabularies):
+    #     train_rep = np.load(f"Results/bow_train_{i}.npy")
+    #     test_rep = np.load(f"Results/bow_test_{i}.npy")
+    #     start_time = time.time()
+    #     predicted_labels = KNN_classifier(train_features=train_rep, train_labels=train_labels, test_features=test_rep, num_neighbors=9)
+    #     runtime = time.time() - start_time
+    #     accuracy = reportAccuracy(test_labels, predicted_labels)
+    #     knn_accuracies.append(accuracy)
+    #     knn_runtimes.append(runtime)
     
-    print("accuracies:", knn_accuracies)
-    print("runtimes:", knn_runtimes)
-    np.save(SAVEPATH+'knn_accuracies.npy', np.asarray(knn_accuracies)) # Save the accuracies in the Results/ directory
-    np.save(SAVEPATH+'knn_runtimes.npy', np.asarray(knn_runtimes)) # Save the runtimes in the Results/ directory
+    # print("accuracies:", knn_accuracies)
+    # print("runtimes:", knn_runtimes)
+    # np.save(SAVEPATH+'knn_accuracies.npy', np.asarray(knn_accuracies)) # Save the accuracies in the Results/ directory
+    # np.save(SAVEPATH+'knn_runtimes.npy', np.asarray(knn_runtimes)) # Save the runtimes in the Results/ directory
     
     # Use BOW features to classify the images with 15 Linear SVM classifiers
     lin_accuracies = []
     lin_runtimes = []
     
-    # Your code below
-    #...
+    print("HERE WE GO")
+    for i, vocab in enumerate(vocabularies):
+        train_rep = np.load(f"Results/bow_train_{i}.npy")
+        test_rep = np.load(f"Results/bow_test_{i}.npy")
+        start_time = time.time()
+        predicted_categories = SVM_classifier(train_features=train_rep, train_labels=train_labels, test_features=test_rep, is_linear=True, svm_lambda=10)
+        runtime = time.time() - start_time
+        accuracy = reportAccuracy(test_labels, predicted_categories)
+        lin_accuracies.append(accuracy)
+        lin_runtimes.append(runtime)
+    
+    print("accuracies:", lin_accuracies)
+    print("runtimes:", lin_runtimes)
 
     np.save(SAVEPATH+'lin_accuracies.npy', np.asarray(lin_accuracies)) # Save the accuracies in the Results/ directory
     np.save(SAVEPATH+'lin_runtimes.npy', np.asarray(lin_runtimes)) # Save the runtimes in the Results/ directory
@@ -135,8 +148,18 @@ if __name__ == "__main__":
     rbf_accuracies = []
     rbf_runtimes = []
     
-    # Your code below
-    # ...
+    for i, vocab in enumerate(vocabularies):
+        train_rep = np.load(f"Results/bow_train_{i}.npy")
+        test_rep = np.load(f"Results/bow_test_{i}.npy")
+        start_time = time.time()
+        predicted_categories = SVM_classifier(train_features=train_rep, train_labels=train_labels, test_features=test_rep, is_linear=False, svm_lambda=10)
+        runtime = time.time() - start_time
+        accuracy = reportAccuracy(test_labels, predicted_categories)
+        rbf_accuracies.append(accuracy)
+        rbf_runtimes.append(runtime)
+    
+    print("accuracies:", rbf_accuracies)
+    print("runtimes:", rbf_runtimes)
     
     np.save(SAVEPATH +'rbf_accuracies.npy', np.asarray(rbf_accuracies)) # Save the accuracies in the Results/ directory
     np.save(SAVEPATH +'rbf_runtimes.npy', np.asarray(rbf_runtimes)) # Save the runtimes in the Results/ directory

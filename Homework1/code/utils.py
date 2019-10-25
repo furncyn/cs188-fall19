@@ -7,6 +7,7 @@ import random
 from scipy import spatial
 from sklearn import neighbors, svm, cluster, preprocessing
 from sklearn.cluster import AgglomerativeClustering, KMeans
+from sklearn.svm import SVC, LinearSVC
 
 
 def load_data():
@@ -77,7 +78,65 @@ def SVM_classifier(train_features, train_labels, test_features, is_linear, svm_l
 
     # predicted_categories is an M x 1 array, where each entry is an integer
     # indicating the predicted category for each test feature.
+    classifiers = []
+    predicted_categories = []
+    for i in range(15):
+        if is_linear:
+            clf = LinearSVC(C=svm_lambda)
+            # clf = SVC(C=svm_lambda)
+        else:
+            clf = SVC(C=svm_lambda, kernel="rbf", gamma="scale")
+        # train an svm on bow features
+        new_labels = []
+        for label in train_labels:
+            if label == i:
+                new_labels.append(1)
+            else:
+                new_labels.append(0)
+        clf = clf.fit(train_features, new_labels)
+        classifiers.append(clf)
+    for test in test_features:
+        predicted_categories.append(np.asarray([c.decision_function([test])[0] for c in classifiers]).argmin())
+        # prediction = []
+        # for c in classifiers:
+        #     prediction.append(c.decision_function([test])[0])
+        # predicted_categories.append(np.asarray(prediction).argmin())
+            
+        # predicted_class = -1
+        # greatest_confidence_level = -1
+        # for i in range(len(classifiers)):
+        #     confidence_level = classifiers[i].predict_proba([test_features[i]])
+        #     print("confidence_level: ",confidence_level)
+        #     if confidence_level[0][1] > greatest_confidence_level:
+        #         greatest_confidence_level = confidence_level
+        #         predicted_class = i
+        # predicted_categories.append(predicted_class)
     return predicted_categories
+    # for i in range(len(test_features)):
+    #     # for every test_feature, compare all 15 svm confidence scores
+    #     # append the highest one to predicted_categories
+    #     probability = -1
+    #     predicted_category = -1
+    #     for s in range(len(predicted_proba_categories)):
+    #         if predicted_proba_categories[s][i] > max_proba:
+    #             max_proba = predicted_proba_categories
+    #             # do we need to call predict too?
+    #             predicted_category = 
+    #             predicted_categories.append(predicted_category)
+    # return predicted_categories
+        
+    #         classifiers.append(clf)
+    #     # run a test_feature on every svm, most confident wins
+    #     for feature in test_features:
+    #         max_proba = -1
+    #         predicted_category = -1
+    #         for c in range(len(classifiers)):
+    #             score = classifiers[c].predict(test_features)
+    #             if score > max_proba:
+    #                 max_proba = score
+    #                 predicted_category = c
+    #         predicted_categories.append(predicted_category)             
+    # return predicted_categories
 
 
 def imresize(input_image, target_size):
@@ -208,7 +267,7 @@ def computeBow(image, vocabulary, feature_type):
         return Bow
 
     # Normalize the Bow representation
-    # Bow = np.asarray(Bow)/float(len(descriptors))
+    Bow = np.asarray(Bow)/float(len(descriptors))
     return Bow
 
 
