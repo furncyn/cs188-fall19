@@ -93,8 +93,6 @@ def SVM_classifier(train_features, train_labels, test_features, is_linear, svm_l
                 new_labels.append(1)
             else:
                 new_labels.append(0)
-        # print(train_labels)
-        # print(new_labels)
         clf = clf.fit(train_features, new_labels)
         classifiers.append(clf)
     for test in test_features:

@@ -33,7 +33,7 @@ if __name__ == "__main__":
     
     # Load data, the function is written for you in utils
     train_images, test_images, train_labels, test_labels = load_data()
-    
+    print(train_labels)
     # Change the default for --tiny to be False. Need to specify True if want to run this function.
     if args.tiny:
         # You have to write the tinyImages function
