@@ -200,7 +200,8 @@ def computeBow(image, vocabulary, feature_type):
     Bow = [0] * len(vocabulary)
     try:
         for des in descriptors:
-            dist_2 = np.sum((vocabulary - des)**2, axis=1)
+            # dist_2 = np.sum((vocabulary - des)**2, axis=1)
+            dist_2 = spatial.distance.cdist(vocabulary, [des])
             bucket = np.argmin(dist_2)
             Bow[bucket] += 1
     except TypeError as e:
@@ -208,7 +209,7 @@ def computeBow(image, vocabulary, feature_type):
         return Bow
 
     # Normalize the Bow representation
-    # Bow = np.asarray(Bow)/float(len(descriptors))
+    Bow = np.asarray(Bow)/float(len(descriptors))
     return Bow
 
 
