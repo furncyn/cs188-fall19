@@ -80,7 +80,7 @@ def SVM_classifier(train_features, train_labels, test_features, is_linear, svm_l
     # indicating the predicted category for each test feature.
     classifiers = []
     predicted_categories = []
-    for i in range(15):
+    for i in range(1, 16):
         if is_linear:
             clf = LinearSVC(C=svm_lambda)
             # clf = SVC(C=svm_lambda)
@@ -93,6 +93,8 @@ def SVM_classifier(train_features, train_labels, test_features, is_linear, svm_l
                 new_labels.append(1)
             else:
                 new_labels.append(0)
+        # print(train_labels)
+        # print(new_labels)
         clf = clf.fit(train_features, new_labels)
         classifiers.append(clf)
     for test in test_features:
@@ -197,6 +199,8 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
     feature_size = 25
     all_descriptors = []
 
+    # TODO: Create feature for every image
+
     # Extract features of the images using specified feature type
     if (feature_type == "sift"):    
         feature = cv2.xfeatures2d.SIFT_create(nfeatures=feature_size)
@@ -232,7 +236,7 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
             count[labels[i]] += 1
         # Calculate the cluster centroids by dividing the number of descriptors per labels to its sum and normalize the result
         for i in range(dict_size):
-            vocabulary[i] = np.true_divide(vocabulary[i], count[i])
+            vocabulary[i] = vocabulary[i]/float(count[i])
 
     return vocabulary
 
@@ -256,12 +260,15 @@ def computeBow(image, vocabulary, feature_type):
     
     _, descriptors = feature.detectAndCompute(image, None)
 
+    # TODO: We have to run KNN classifier here to create a histogram
+    # Normalize the results using cv2.normalize
     Bow = [0] * len(vocabulary)
+    
+    # predicted_labels = KNN_classifier(vocabulary, range(len(vocabulary)), descriptors, 9)
+
     try:
         for des in descriptors:
-            dist_2 = np.sum((vocabulary - des)**2, axis=1)
-            bucket = np.argmin(dist_2)
-            Bow[bucket] += 1
+            Bow[np.array(np.linalg.norm(des-vocabulary, axis=1)).argmax()]+=1
     except TypeError as e:
         print(f"WARNING: {str(e)}. Ignoring this image and returning all-zeroes Bow.")
         return Bow
