@@ -62,20 +62,18 @@ if __name__ == "__main__":
         print("Calling buildDict to build vocabularies...")
 
     for feature in ['sift', 'surf', 'orb']:
-        for algo in ['hierarchical']:
+        for algo in ['kmeans', 'hierarchical']:
             for dict_size in [20, 50]:
                 if args.build_dict:
                     vocabulary = buildDict(train_images, dict_size, feature, algo)
-                    # filename = 'voc_' + feature + '_' + algo + '_' + str(dict_size) + '.npy'
-                    # print(filename)
-                    print(feature, algo, dict_size)
-                    print(vocabulary)
-                    # np.save(SAVEPATH + filename, np.asarray(vocabulary))
+                    filename = 'voc_' + feature + '_' + algo + '_' + str(dict_size) + '.npy'
+                    print(filename)
+                    np.save(SAVEPATH + filename, np.asarray(vocabulary))
                 else:
                     filename = f"{SAVEPATH}/voc_{feature}_{algo}_{dict_size}.npy"
                     vocabulary = np.load(filename)
-                # vocabularies.append(vocabulary) # A list of vocabularies (which are 2D arrays)
-                # vocab_idx.append(filename.split('.')[0]) # Save the map from index to vocabulary
+                vocabularies.append(vocabulary) # A list of vocabularies (which are 2D arrays)
+                vocab_idx.append(filename.split('.')[0]) # Save the map from index to vocabulary
 
     # Compute the Bow representation for the training and testing sets
     test_rep = [] # To store a set of BOW representations for the test images (given a vocabulary)
