@@ -230,6 +230,7 @@ def buildDict(train_images, dict_size, feature_type, clustering_type):
             if vocabulary[labels[i]] is None:
                 vocabulary[labels[i]] = all_descriptors[i]
             else:
+                print("hi")
                 vocabulary[labels[i]] = np.add(vocabulary[labels[i]], all_descriptors[i])
             count[labels[i]] += 1
         # Calculate the cluster centroids by dividing the number of descriptors per labels to its sum and normalize the result
@@ -266,7 +267,7 @@ def computeBow(image, vocabulary, feature_type):
 
     try:
         for des in descriptors:
-            Bow[np.array(np.linalg.norm(des-vocabulary, axis=1)).argmax()]+=1
+            Bow[np.array(np.linalg.norm(des-vocabulary, axis=1)).argmin()]+=1
     except TypeError as e:
         print(f"WARNING: {str(e)}. Ignoring this image and returning all-zeroes Bow.")
         return Bow
