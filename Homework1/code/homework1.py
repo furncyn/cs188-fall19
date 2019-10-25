@@ -59,8 +59,8 @@ if __name__ == "__main__":
     if args.build_dict:
         print("Calling buildDict to build vocabularies...")
 
-    for feature in ['surf', 'orb']:
-        for algo in ['hierarchical']:
+    for feature in ['sift', 'surf', 'orb']:
+        for algo in ['kmeans', 'hierarchical']:
             for dict_size in [20, 50]:
                 if args.build_dict:
                     vocabulary = buildDict(train_images, dict_size, feature, algo)
