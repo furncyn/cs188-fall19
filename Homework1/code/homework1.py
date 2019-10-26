@@ -2,12 +2,10 @@
 from utils import *
 import argparse
 
-# TO-DO: change default for tiny and build-dict to True
-
 parser = argparse.ArgumentParser(description='CS188.2 - Fall 19 - Homework 1')
-parser.add_argument("--tiny", "-t", type=bool, default=False, help='run Tiny Images')
+parser.add_argument("--tiny", "-t", type=bool, default=True, help='run Tiny Images')
 parser.add_argument("--create-path", "-cp", type=bool, default=True, help='create the Results directory')
-parser.add_argument("--build-dict", "-bd", type=bool, default=False, help='create a new set of vocabularies, instead of loading from Results directory')
+parser.add_argument("--build-dict", "-bd", type=bool, default=True, help='create a new set of vocabularies, instead of loading from Results directory')
 args = parser.parse_args()
 
 # The argument is included as an idea for debugging, with a few examples in the main. Feel free to modify it or add arguments.
