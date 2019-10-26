@@ -80,7 +80,7 @@ def SVM_classifier(train_features, train_labels, test_features, is_linear, svm_l
     # indicating the predicted category for each test feature.
     classifiers = []
     predicted_categories = []
-    for i in range(15):
+    for i in range(1, 16):
         if is_linear:
             clf = LinearSVC(C=svm_lambda)
         else:
