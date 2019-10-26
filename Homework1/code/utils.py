@@ -80,7 +80,7 @@ def SVM_classifier(train_features, train_labels, test_features, is_linear, svm_l
     # indicating the predicted category for each test feature.
     classifiers = []
     predicted_categories = []
-    for i in range(1, 16):
+    for i in range(15):
         if is_linear:
             clf = LinearSVC(C=svm_lambda)
             # clf = SVC(C=svm_lambda)
@@ -96,7 +96,7 @@ def SVM_classifier(train_features, train_labels, test_features, is_linear, svm_l
         clf = clf.fit(train_features, new_labels)
         classifiers.append(clf)
     for test in test_features:
-        predicted_categories.append(np.asarray([c.decision_function([test])[0] for c in classifiers]).argmin())
+        predicted_categories.append(np.asarray([c.decision_function([test])[0] for c in classifiers]).argmax() + 1)
         # prediction = []
         # for c in classifiers:
         #     prediction.append(c.decision_function([test])[0])
