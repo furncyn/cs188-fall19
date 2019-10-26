@@ -116,8 +116,8 @@ if __name__ == "__main__":
         knn_accuracies.append(accuracy)
         knn_runtimes.append(runtime)
     
-    print("accuracies:", knn_accuracies)
-    print("runtimes:", knn_runtimes)
+    print("knn accuracies:", knn_accuracies)
+    print("knn runtimes:", knn_runtimes)
     np.save(SAVEPATH+'knn_accuracies.npy', np.asarray(knn_accuracies)) # Save the accuracies in the Results/ directory
     np.save(SAVEPATH+'knn_runtimes.npy', np.asarray(knn_runtimes)) # Save the runtimes in the Results/ directory
     
@@ -135,8 +135,8 @@ if __name__ == "__main__":
         lin_accuracies.append(accuracy)
         lin_runtimes.append(runtime)
     
-    print("accuracies:", lin_accuracies)
-    print("runtimes:", lin_runtimes)
+    print("lin accuracies:", lin_accuracies)
+    print("lin runtimes:", lin_runtimes)
 
     np.save(SAVEPATH+'lin_accuracies.npy', np.asarray(lin_accuracies)) # Save the accuracies in the Results/ directory
     np.save(SAVEPATH+'lin_runtimes.npy', np.asarray(lin_runtimes)) # Save the runtimes in the Results/ directory
@@ -155,8 +155,8 @@ if __name__ == "__main__":
         rbf_accuracies.append(accuracy)
         rbf_runtimes.append(runtime)
     
-    print("accuracies:", rbf_accuracies)
-    print("runtimes:", rbf_runtimes)
+    print("rbf accuracies:", rbf_accuracies)
+    print("rbf runtimes:", rbf_runtimes)
     
     np.save(SAVEPATH +'rbf_accuracies.npy', np.asarray(rbf_accuracies)) # Save the accuracies in the Results/ directory
     np.save(SAVEPATH +'rbf_runtimes.npy', np.asarray(rbf_runtimes)) # Save the runtimes in the Results/ directory
