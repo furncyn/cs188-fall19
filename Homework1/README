@@ -1,0 +1,37 @@
+Chayanis Techalertumpai, 404798097, furncyn@ucla.edu
+Connie Chen, 904920137, conniechenn21@ucla.edu
+
+Source codes in code/
+
+utils.py: script that contains functions used by homework1.py
+    KNN_classifier: takes in an array of training images, training labels, test images and a number of neighbors and
+       returns the predicted labels of the test images. The function trains K-Neighbors classifier using the training set 
+       and labels provided and predict the labels of the test images.
+
+    SVM_classifier: takes in an array of training images, training labels, and test images, a boolean is_linear, and 
+       a scalar svm_lambda. The function trains SVM classifier using the training set and predicts the labels of the 
+       test images.
+    
+    imresize: takes in an input image and a 2D array for target size and returns a resized image.
+
+    reportAccuracy: takes in an array of true labels and predicted labels and returns the accuracy rate of the
+       two labels in %
+
+    buildDict: takes in an array of training images, an integer of dict size, a string of feature type, and a string of 
+       clustering type and returns a 2D-array of size dict_size x d where d is the dimension of the feature. Each row of 
+       the vocabulary is a cluster centroid.
+    
+    computeBow: takes in an image, a vocabulary, and a string of feature type and returns a BOW representation of the image.
+       The BOW representation is constructed by creating descriptors of the image using the specified feature type. Then create
+       a histogram where the bin label is the cluster centroid and the height of the histogram is the number of descriptors that
+       belongs to that cluster centroid. The BOW representation is normalized at the end.
+    
+    tinyImages: takes in an array of training images, training labels, test images, and test labeles and returns an array classResult
+       which contains the accuracy and runtime of running a K-Neighbors classifier on different resized images and number of neighbors.
+       The purpose of this function is to compare the accuracies and runtimes of using K-Neighbors classifier with different parameters.
+
+
+homework1.py: the main logic of the project. The script takes in three command line flags:
+        --tiny: specified to run tinyImages function. Default is set to True.
+        --create-path: specified to create a new directory Results/ where all output files will be saved at.
+        --build-dict: specified to create a new set of vocabularies, instead of loading them from Results directory. Default is set to True.
