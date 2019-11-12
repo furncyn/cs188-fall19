@@ -50,9 +50,10 @@ def detect_template(img_path, template_path):
 
     ax.imshow(result, cmap=plt.cm.gray)
     ax.autoscale(False)
+    print(result)
     plt.show()
 
 
 if __name__ == "__main__":
-    readvideo(args.video_path)
+    # readvideo(args.video_path)
     detect_template("../pictures/frame_0.jpg", rabbit_template_path)
