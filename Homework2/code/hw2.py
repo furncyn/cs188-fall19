@@ -20,7 +20,6 @@ parser.add_argument("video_path", nargs="?", default="video.MOV",
 args = parser.parse_args()
 
 dir_path = "../pictures/"
-boo_template_path = "../pictures/boo.jpg"
 frame_count = 280 # known constant
 
 
@@ -36,9 +35,9 @@ def readvideo(path):
             print("Processing frame " + str(count))
             if args.gray:
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                cv2.imwrite("../pictures/grayscale_frame_" + str(count) + ".jpg", gray)
+                cv2.imwrite(dir_path + "grayscale_frame_" + str(count) + ".jpg", gray)
             else:
-                cv2.imwrite("../pictures/frame_" + str(count) + ".jpg", frame)
+                cv2.imwrite(dir_path + "frame_" + str(count) + ".jpg", frame)
             count = count + 1
         else:
             break
@@ -68,6 +67,7 @@ def template_ncc(img_path, template_path):
 def plot_pixel_shifts(path, template_path):
     template = cv2.imread(template_path, 0)
     max_coordinates = []
+    
     print("gathering coordinates..")
     for i in range(frame_count):
         img = cv2.imread(path + "frame_" + str(i) + ".jpg", 0)
@@ -108,7 +108,7 @@ def synthesize(matrix, template_name):
 
     all_translated_images = np.true_divide(all_translated_images, frame_count)
     all_translated_images = all_translated_images.astype(np.uint8)
-    cv2.imwrite("../synthesized_image_" + template_name + ".jpg", all_translated_images)
+    cv2.imwrite("../pictures/synthesized_image_" + template_name + ".jpg", all_translated_images)
 
 
 if __name__ == "__main__":
@@ -122,3 +122,10 @@ if __name__ == "__main__":
     else:
         ncc_template1 = np.load("ncc_boo.npy")
     synthesize(ncc_template1, "dog")
+
+    # 2.6
+    if args.ncc:
+        ncc_template2 = plot_pixel_shifts(dir_path, dir_path + "can.jpg")
+    else:
+        ncc_template2 = np.load("ncc_can.npy")
+    synthesize(ncc_template2, "can")
