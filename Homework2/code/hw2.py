@@ -67,7 +67,6 @@ def template_ncc(img_path, template_path):
 def plot_pixel_shifts(path, template_path):
     template = cv2.imread(template_path, 0)
     max_coordinates = []
-    
     print("gathering coordinates..")
     for i in range(frame_count):
         img = cv2.imread(path + "frame_" + str(i) + ".jpg", 0)
