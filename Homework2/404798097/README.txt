@@ -1,8 +1,9 @@
-Chayanis Techalertumpai, 404798097, furncyn@ucla.edu
-Connie Chen, 904920137, conniechenn21@ucla.edu
+Chayanis Techalertumpai,404798097,furncyn@ucla.edu
+Connie Chen,904920137,conniechenn21@ucla.edu
 
 
 Resources used to complete the project:
+
 Task 2.1 - 2.3
   - https://www.geeksforgeeks.org/python-program-extract-frames-using-opencv/
 Task 2.4
