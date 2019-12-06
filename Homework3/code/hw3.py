@@ -314,6 +314,7 @@ def ResNet(input_shape=(32, 32, 3), classes=10):
     # Stage 1
     X = Conv2D(filters=64, kernel_size=(7,7), strides=(2,2), padding="valid", kernel_initializer=keras.initializers.glorot_uniform(seed=0))(X)
     X = BatchNormalization(axis=3)(X)
+    X = Activation("relu")(X)
     X = MaxPooling2D(pool_size=(3, 3), strides=(2, 2))(X)
 
     # Stage 2
