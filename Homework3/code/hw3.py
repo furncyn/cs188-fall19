@@ -29,7 +29,7 @@ from keras.utils import layer_utils
 from keras.utils.data_utils import get_file
 from keras.applications.imagenet_utils import preprocess_input
 import pydot
-import keras 
+import keras
 import matplotlib.pyplot as plt
 from keras.datasets import cifar10
 from keras.regularizers import l1
@@ -59,49 +59,6 @@ def plot_learningCurve(history,num_epoch):
 
 save_dir='/model/resnet'
 
-"""## Note on Conv2D
-
-In order to implement the convolutional layers, we use the Keras implementation of Conv2D. However, in all cases, you are required to use a specific kernel initializer so that the results are predictable ( random initialization of convolutional kernel would result in unpredictable ).
-
-As such, please use the following Conv2D: 
-
-Conv2D(filters=f, kernel_size=(k, k), strides=(s, s), padding=pad_type, kernel_initializer=keras.initializers.glorot_uniform(seed=0))(X)
-
-In which f,k and s denote the size of filter,kernel and stride. Pad_type denoted the padding type which can be either "same" or "valid".
-
-##Implementing the Identity Block 
-
-We discussed the identity block in the homework description. Here we provide the details of the components that you should use to implement it. 
-
-The following represents the components: 
-
-First component of main path: 
-- The first CONV2D has $F_1$ filters of shape (1,1) and a stride of (1,1). Its padding is "valid". Use 0 as the seed for the random initialization. 
-- The first BatchNorm is normalizing the channels axis. No particular argument needs to be passed.
-- Then apply the ReLU activation function. This has no hyperparameters. 
-
-Second component of main path:
-- The second CONV2D has $F_2$ filters of shape $(f,f)$ and a stride of (1,1). Its padding is "same". Use 0 as the seed for the random initialization. 
-- The second BatchNorm is normalizing the channels axis. No particular argument needs to be passed.
-- Then apply the ReLU activation function. This has no hyperparameters
-
-Third component of main path:
-- The third CONV2D has $F_3$ filters of shape (1,1) and a stride of (1,1). Its padding is "valid". Use 0 as the seed for the random initialization. 
-- The third BatchNorm is normalizing the channels axis. No particular argument needs to be passed. 
-- Then apply the ReLU activation function. This has no hyperparameters
-
-Final step: 
-- The shortcut and the input are added together.
-- Then apply the ReLU activation function. This has no hyperparameters
-
-Useful links:
-
-- [Conv](https://keras.io/layers/convolutional/#conv2d)
-- [BatchNorm](https://keras.io/layers/normalization/#batchnormalization)
-- For the activation, use:  `Activation('relu')(X)`
-- [Addition](https://keras.io/layers/merge/#add)
-"""
-
 def identity_block(X, f, filters):
     """
     Implementation of the identity block as defined in Figure 4 of homework
@@ -119,7 +76,7 @@ def identity_block(X, f, filters):
     # Retrieve Filters
     f1, f2, f3 = filters
 
-    # Save the input value. You'll need this later to add back to the main path. 
+    # Save the input value. You'll need this later to add back to the main path.
     X_shortcut = X
 
     # First component of main path
@@ -139,7 +96,7 @@ def identity_block(X, f, filters):
     # Final step: Add shortcut value to main path, and pass it through a RELU activation (≈2 lines)
     X = Add()([X, X_shortcut])
     X = Activation("relu")(X)
-    
+
     return X
 
 """##Testing the Identity Block
@@ -158,41 +115,6 @@ with tf.Session() as test:
     res = test.run([A], feed_dict={A_prev: X})
     print('Result = {}'.format(res[0][1][1][0]))
 
-"""##Implementing the Convolutional Block 
-
-We discussed the convolutional block in the homework description. Here we provide the details of the components that you should use to implement it. 
-
-The following represents the components: 
-
-First component of main path:
-- The first CONV2D has $F_1$ filters of shape (1,1) and a stride of (s,s). Its padding is "valid". 
-- The first BatchNorm is normalizing the channels axis. No particular argument needs to be passed.
-- Then apply the ReLU activation function. This has no hyperparameters. 
-
-Second component of main path:
-- The second CONV2D has $F_2$ filters of (f,f) and a stride of (1,1). Its padding is "same".
-- The second BatchNorm is normalizing the channels axis. No particular argument needs to be passed.
-- Then apply the ReLU activation function. This has no hyperparameters. 
-
-Third component of main path:
-- The third CONV2D has $F_3$ filters of (1,1) and a stride of (1,1). Its padding is "valid".
-- The third BatchNorm is normalizing the channels axis. No particular argument needs to be passed. Note that there is no ReLU activation function in this component. 
-
-Shortcut path:
-- The CONV2D has $F_3$ filters of shape (1,1) and a stride of (s,s). Its padding is "valid".
-- The BatchNorm is normalizing the channels axis. BatchNorm is normalizing the channels axis. No particular argument needs to be passed
-
-Final step: 
-- The shortcut and the main path values are added together.
-- Then apply the ReLU activation function. This has no name and no hyperparameters. 
-
-Useful links:
-
-- [Conv](https://keras.io/layers/convolutional/#conv2d)
-- [BatchNorm](https://keras.io/layers/normalization/#batchnormalization)
-- For the activation, use:  `Activation('relu')(X)`
-- [Addition](https://keras.io/layers/merge/#add)
-"""
 
 def convolutional_block(X, f, filters,stride=2):
     """
@@ -214,7 +136,7 @@ def convolutional_block(X, f, filters,stride=2):
     # Save the input value
     X_shortcut = X
 
-    # First component of main path 
+    # First component of main path
     X = Conv2D(filters=f1, kernel_size=(1,1), strides=(stride,stride), padding="valid", kernel_initializer=keras.initializers.glorot_uniform(seed=0))(X)
     X = BatchNormalization()(X)
     X = Activation("relu")(X)
@@ -228,21 +150,17 @@ def convolutional_block(X, f, filters,stride=2):
     # Third component of main path (≈2 lines)
     X = Conv2D(filters=f3, kernel_size=(1,1), strides=(1,1), padding="valid", kernel_initializer=keras.initializers.glorot_uniform(seed=0))(X)
     X = BatchNormalization()(X)
-    
+
     ##### SHORTCUT PATH #### (≈2 lines)
     X_shortcut = Conv2D(filters=f3, kernel_size=(1,1), strides=(stride,stride), padding="valid", kernel_initializer=keras.initializers.glorot_uniform(seed=0))(X_shortcut)
     X_shortcut = BatchNormalization()(X_shortcut)
-    
+
     # Final step: Add shortcut value to main path, and pass it through a RELU activation (≈2 lines)
     X = Add()([X, X_shortcut])
     X = Activation("relu")(X)
 
     return X
 
-"""##Testing the Convolutional Block
-
-Simply run the code in the following block and report the result that is generated in your homework report.
-"""
 
 tf.reset_default_graph()
 
@@ -255,42 +173,6 @@ with tf.Session() as test:
     res = test.run([A], feed_dict={A_prev: X})
     print('Result = {}'.format(res[0][1][1][0]))
 
-"""##Implementing ResNet 
-
-We discussed the ResNet architecture in the homework description ( see Figure 6 ). Here we provide further details you should use to implement it.
-The following represents ResNet components: 
-
-- Zero-padding pads the input with a pad of (3,3)
-- Stage 1:
-    - The 2D Convolution has 64 filters of shape (7,7) and uses a stride of (2,2).
-    - BatchNorm is applied to the channels axis of the input.
-    - MaxPooling uses a (3,3) window and a (2,2) stride.
-- Stage 2:
-    - The convolutional block uses three set of filters of size [64,64,256], "f" is 3, "s" is 1.
-    - The 2 identity blocks use three set of filters of size [64,64,256], "f" is 3.
-- Stage 3:
-    - The convolutional block uses three set of filters of size [128,128,512], "f" is 3, "s" is 2.
-    - The 3 identity blocks use three set of filters of size [128,128,512], "f" is 3.
-- Stage 4:
-    - The convolutional block uses three set of filters of size [256, 256, 1024], "f" is 3, "s" is 2.
-    - The 5 identity blocks use three set of filters of size [256, 256, 1024], "f" is 3.
-- Stage 5:
-    - The convolutional block uses three set of filters of size [512, 512, 2048], "f" is 3, "s" is 2.
-    - The 2 identity blocks use three set of filters of size [256, 256, 2048], "f" is 3.
-- The 2D Average Pooling uses a window of shape (2,2).
-- The flatten doesn't have any hyperparameters.
-- The Fully Connected (Dense) layer reduces its input to the number of classes using a softmax activation.
-
-Useful links:
-
-- [Conv](https://keras.io/layers/convolutional/#conv2d)
-- [BatchNorm](https://keras.io/layers/normalization/#batchnormalization)
-- For the activation, use:  `Activation('relu')(X)`
-- [Addition](https://keras.io/layers/merge/#add)
-- [Average pooling](https://keras.io/layers/pooling/#averagepooling2d)
-- [Max pooling](https://keras.io/layers/pooling/#maxpooling2d)
-- [Zero padding](https://keras.io/layers/convolutional/#zeropadding2d)
-"""
 
 def ResNet(input_shape=(32, 32, 3), classes=10):
     """
@@ -304,7 +186,7 @@ def ResNet(input_shape=(32, 32, 3), classes=10):
 
     Returns:
     model -- a Model() instance in Keras
-    """ 
+    """
     # Define the input as a tensor with shape input_shape
     X_input = Input(input_shape)
 
@@ -334,7 +216,7 @@ def ResNet(input_shape=(32, 32, 3), classes=10):
     X = identity_block(X, filters=[256,256,1024], f=3)
     X = identity_block(X, filters=[256,256,1024], f=3)
     X = identity_block(X, filters=[256,256,1024], f=3)
-  
+
     # Stage 5 (≈3 lines)
     X = convolutional_block(X, filters=[512,512,2048], f=3, stride=2)
     X = identity_block(X, filters=[256,256,2048], f=3)
@@ -346,7 +228,7 @@ def ResNet(input_shape=(32, 32, 3), classes=10):
     # output layer
     X = Flatten()(X)
     X = Dense(classes, activation="softmax")(X)
-   
+
 
     # Create model
     model = Model(inputs=X_input, outputs=X, name='ResNe')
@@ -405,7 +287,7 @@ datagen.fit(x_train)
 
 """##Compile the Model
 
-The following block sets the required hyper-parameters, complies the model starts the process of training and at the end saves the trained model. 
+The following block sets the required hyper-parameters, complies the model starts the process of training and at the end saves the trained model.
 
 You can use your own hyper-parameters, but these have been tested to work properly.
 
@@ -416,7 +298,7 @@ batch_size = 2048
   epochs = 50
   data_augmentation = True
   learning_rate=0.001
-  
+
   opt = keras.optimizers.adam(lr=learning_rate, decay=1e-6)
   model.compile(loss='categorical_crossentropy',optimizer=opt,metrics=['accuracy'])
   t1=time()
@@ -428,7 +310,7 @@ batch_size = 2048
   print('Training time is {} s'.format(time()-t1))
   if not os.path.isdir(save_dir):
       os.makedirs(save_dir)
-  
+
   model_name='resnet'
   model_path = os.path.join(save_dir, model_name)
   model.save(model_path)
